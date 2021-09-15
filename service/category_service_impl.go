@@ -15,7 +15,7 @@ type CategoryServiceImpl struct {
 }
 
 func (service *CategoryServiceImpl) Create(ctx context.Context, request web.CategoryCreateRequest) web.CategoryResponse {
-	tx,err := service.DB.Begin()
+	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
@@ -28,13 +28,12 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request web.Cate
 	return helper.ToCategoryResponse(category)
 }
 
-
 func (service *CategoryServiceImpl) Update(ctx context.Context, request web.CategoryUpdateRequest) web.CategoryResponse {
-	tx,err := service.DB.Begin()
+	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	category,err := service.CategoryRepository.FindById(ctx, tx, request.Id)
+	category, err := service.CategoryRepository.FindById(ctx, tx, request.Id)
 	helper.PanicIfError(err)
 
 	category.Name = request.Name
@@ -45,18 +44,18 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request web.Cate
 }
 
 func (service *CategoryServiceImpl) Delete(ctx context.Context, categoryId int) {
-	tx,err := service.DB.Begin()
+	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	category,err := service.CategoryRepository.FindById(ctx, tx, categoryId)
+	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
 	helper.PanicIfError(err)
 
 	service.CategoryRepository.Delete(ctx, tx, category)
 }
 
 func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId int) web.CategoryResponse {
-	tx,err := service.DB.Begin()
+	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
@@ -67,16 +66,11 @@ func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId int
 }
 
 func (service *CategoryServiceImpl) FindAll(ctx context.Context) []web.CategoryResponse {
-	tx,err := service.DB.Begin()
+	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	categories := service.CategoryRepository.FindAll(ctx,tx)
+	categories := service.CategoryRepository.FindAll(ctx, tx)
 
-	var categoryResponses []web.CategoryResponse
-	for _, category := range categories {
-		categoryResponses = append(categoryResponses, helper.ToCategoryResponse(category))
-	}
-	return categoryResponses
+	return helper.ToCategoryResponses(categories)
 }
-
